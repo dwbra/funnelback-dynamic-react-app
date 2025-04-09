@@ -1,0 +1,21 @@
+.flex-items {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+
+.search {
+  &__total-results {
+    margin: 20px 0;
+  }
+  &__form {
+    position: relative;
+    display: flex;
+    gap: 30px;
+
+    .MuiAutocomplete-input {
+      min-width: 200px !important;
+      border: none !important;
+    }
+  }
+}

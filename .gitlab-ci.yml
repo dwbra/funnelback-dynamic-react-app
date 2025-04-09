@@ -1,0 +1,45 @@
+image: docker-hub.squiz.net/au-client-implementation/docker-images/node:20
+
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  tags:
+    - docker
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH !~ /^deploy/ && $CI_COMMIT_MESSAGE !~ /^\[WIP\]/
+
+deploy:
+  stage: deploy
+  tags:
+    - docker
+  before_script:
+    - eval $(ssh-agent -s)
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add - > /dev/null
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+    - chmod 644 ~/.ssh/known_hosts
+    - git config --global user.name "$GITLAB_USER_NAME"
+    - git config --global user.email "$GITLAB_USER_EMAIL"
+  script:
+    - DEPLOY_BRANCH="deploy/prod"
+    - cd dist
+    - git init
+    - git checkout -b "$DEPLOY_BRANCH"
+    - git add -f .
+    - git commit -m "Runner build of ${CI_COMMIT_SHA:0:8}" -m "Original message:" -m "$CI_COMMIT_MESSAGE"
+    - git remote add origin "$BUILD_REPOSITORY"
+    - git push --force origin "$DEPLOY_BRANCH"
+  dependencies:
+    - build
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "merge_request_event" && $CI_COMMIT_BRANCH !~ /^deploy/ && $CI_COMMIT_MESSAGE !~ /^\[WIP\]/
