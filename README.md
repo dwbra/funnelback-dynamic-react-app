@@ -98,12 +98,13 @@ For guidance on CI/CD pipelines and Git Bridge, refer to:
 
 To begin local development:
 
-````bash
+```bash
 # Install dependencies
 npm install
 
 # Start the dev server
 npm run dev
+```
 
 ## 📋 Final Setup Instructions
 
@@ -117,10 +118,9 @@ Once the project is running, follow these steps to tailor it to your data model 
 - 🎨 **Add any custom SCSS** if required for styling.
 - 📦 **Build the final output:**
 
-
 ```bash
 npm run build
-````
+```
 
 - 📁 **Upload** the output files (typically found in `dist/`) to **Squiz Matrix**.
 - 🧩 **Embed the assets** in a Matrix page — and voilà, your search app is live!
