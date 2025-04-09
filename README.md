@@ -74,10 +74,6 @@ This frontend is built with:
 
 The `index.html` file shows how to structure the target `<div>` in Matrix to pass props directly into the React app for search requests.
 
-For facetTypes, pass in a string with multiple facets like:
-
-`checkbox-checkbox-select`
-
 ---
 
 ## 🛠️ DevOps & Deployment

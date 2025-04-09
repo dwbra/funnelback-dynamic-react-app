@@ -82,7 +82,7 @@ const defaultState: DataState = {
   totalResults: 0,
   query: "",
   facets: [],
-  facetTypes: [],
+  facetTypes: ["checkbox"],
   selectedFacets: [],
   startRank: "",
   networkRquestInProgress: { error: "", inProgress: false },

@@ -12,11 +12,6 @@ const dataStateReducer = (state: DataState, action: any) => {
         ...state,
         results: action.results,
       };
-    case "setFacetTypes":
-      return {
-        ...state,
-        facetTypes: action.types,
-      };
     case "setStartRank":
       return {
         ...state,
