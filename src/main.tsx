@@ -18,6 +18,7 @@ if (ntuImageSearchSelector.length > 0) {
     const profile = el.dataset.profile || "";
     const numRanks = el.dataset.numRanks || "";
     const defaultSort = el.dataset.defaultSort || "";
+    const facetTypes = el.dataset.facetTypes || "";
 
     const fbConfig = {
       searchUrl: resultsUrl,
@@ -31,7 +32,7 @@ if (ntuImageSearchSelector.length > 0) {
 
     createRoot(element).render(
       <DataStateProvider>
-        <App fbConfig={fbConfig} />
+        <App fbConfig={fbConfig} facetTypes={facetTypes} />
       </DataStateProvider>
     );
   });

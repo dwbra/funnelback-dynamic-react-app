@@ -3,6 +3,7 @@ import Search from "./components/Search";
 import { useDataDispatch, useDataState } from "./context/DataState";
 import buildQueryUrl from "./helpers/buildQueryUrl";
 import fetchData from "./helpers/fetchData";
+import splitFacetTypes from "./helpers/splitFacetTypes";
 import "./styles/main.scss";
 
 interface MatrixProps {
@@ -15,14 +16,22 @@ interface MatrixProps {
     numRanks: string;
     defaultSort: string;
   };
+  facetTypes: string;
 }
 
-function App({ fbConfig }: MatrixProps) {
+function App({ fbConfig, facetTypes }: MatrixProps) {
   const { favouriteKeys } = useDataState();
   const dispatch = useDataDispatch();
 
+  const types = splitFacetTypes(facetTypes);
+
   // Set configs always on initial render
   useEffect(() => {
+    dispatch({
+      type: "setFacetTypes",
+      types,
+    });
+
     dispatch({
       type: "setInitialData",
       fbConfig,
