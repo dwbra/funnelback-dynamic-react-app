@@ -43,12 +43,12 @@ const Pagination = () => {
     results?.length > 0 && (
       <section className="search__pagination">
         <MUIPagination
-          size="large"
+          onChange={(_, page) => handleChange(page)}
           page={currentPage}
           count={totalPageCount}
+          size="large"
           showFirstButton
           showLastButton
-          onChange={(_, page) => handleChange(page)}
           variant="outlined"
         />
       </section>

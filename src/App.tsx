@@ -4,28 +4,21 @@ import { useDataDispatch, useDataState } from "./context/DataState";
 import buildQueryUrl from "./helpers/buildQueryUrl";
 import fetchData from "./helpers/fetchData";
 import "./styles/main.scss";
+import useSearchUpdater from "./hooks/useSearchUpdater";
 
-interface MatrixProps {
-  fbConfig: {
-    searchUrl: string;
-    suggestUrl: string;
-    collection: string;
-    defaultQuery: string;
-    profile: string;
-    numRanks: string;
-    defaultSort: string;
-  };
-}
-
-function App({ fbConfig }: MatrixProps) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function App({ fbConfig, templates, selectors }: any) {
   const { favouriteKeys } = useDataState();
   const dispatch = useDataDispatch();
+  useSearchUpdater();
 
   // Set configs always on initial render
   useEffect(() => {
     dispatch({
       type: "setInitialData",
       fbConfig,
+      templates,
+      selectors,
     });
 
     const initialRequest = async () => {

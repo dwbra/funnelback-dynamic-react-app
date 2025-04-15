@@ -1,38 +1,39 @@
 import { createRoot } from "react-dom/client";
 import "./index.css";
-import App from "./App.tsx";
-import { DataStateProvider } from "./context/DataState.tsx";
+import App from "./App";
+import { DataStateProvider } from "./context/DataState";
 
-const ntuImageSearchSelector = document.querySelectorAll(
-  ".react__ntu-image-search"
-);
+const funnelbackReactApp = () => {
+  // Access the global configMap
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const configMap = (window as any).fbConfigMap;
+  const fbConfig = configMap ? configMap.get("fbConfig") : null;
+  const templates = configMap ? configMap.get("templates") : null;
+  const selectors = configMap ? configMap.get("selectors") : null;
 
-if (ntuImageSearchSelector.length > 0) {
-  ntuImageSearchSelector.forEach((element) => {
-    const el = element as HTMLElement; // Explicitly cast to HTMLElement
+  if (!fbConfig) {
+    console.error("Global configuration 'fbConfig' not found.");
+    return;
+  }
 
-    const resultsUrl = el.dataset.searchUrl || "";
-    const suggestionsUrl = el.dataset.suggestUrl || "";
-    const collection = el.dataset.collection || "";
-    const defaultQuery = el.dataset.defaultQuery || "";
-    const profile = el.dataset.profile || "";
-    const numRanks = el.dataset.numRanks || "";
-    const defaultSort = el.dataset.defaultSort || "";
+  if (!templates) {
+    console.error("Global configuration 'templates' not found.");
+    return;
+  }
 
-    const fbConfig = {
-      searchUrl: resultsUrl,
-      suggestUrl: suggestionsUrl,
-      collection: collection,
-      defaultQuery: defaultQuery,
-      profile: profile,
-      numRanks: numRanks,
-      defaultSort: defaultSort,
-    };
+  if (!selectors) {
+    console.error("Global configuration 'selectors' not found.");
+    return;
+  }
 
-    createRoot(element).render(
+  const container = document.querySelector(".react__ual-staff");
+  if (container && fbConfig && templates && selectors) {
+    createRoot(container).render(
       <DataStateProvider>
-        <App fbConfig={fbConfig} />
+        <App fbConfig={fbConfig} templates={templates} selectors={selectors} />
       </DataStateProvider>
     );
-  });
-}
+  }
+};
+
+funnelbackReactApp();

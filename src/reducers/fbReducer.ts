@@ -1,10 +1,15 @@
-import { DataState } from "../context/DataState";
+import { DataStateTyping } from "../context/DataStateTyping";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
-const dataStateReducer = (state: DataState, action: any) => {
+const dataStateReducer = (state: DataStateTyping, action: any) => {
   switch (action.type) {
     case "setInitialData":
-      return { ...state, fbConfig: { ...state.fbConfig, ...action.fbConfig } };
+      return {
+        ...state,
+        fbConfig: { ...state.fbConfig, ...action.fbConfig },
+        selectors: action.selectors,
+        templates: action.templates,
+      };
     case "setQuery":
       return { ...state, query: action.query };
     case "setResults":
@@ -62,7 +67,7 @@ const dataStateReducer = (state: DataState, action: any) => {
     case "removeCheckedFacet": {
       const { facetKey } = action;
       const updatedFacets = state.selectedFacets.filter(
-        (facet) => facet.facetKey !== facetKey
+        (facet: any) => facet.facetKey !== facetKey
       );
       return {
         ...state,
@@ -72,7 +77,7 @@ const dataStateReducer = (state: DataState, action: any) => {
     case "updateSelectFacet": {
       const { facetKey, facetValue, facetType } = action;
       const selectObj = state.selectedFacets.find(
-        (facet) => facet.facetType === facetType
+        (facet: any) => facet.facetType === facetType
       );
 
       if (selectObj) {
@@ -114,7 +119,9 @@ const dataStateReducer = (state: DataState, action: any) => {
     }
     case "removeFavourite": {
       const { key } = action;
-      const updatedFavs = state.favourites.filter((fav) => fav.key !== key);
+      const updatedFavs = state.favourites.filter(
+        (fav: any) => fav.key !== key
+      );
       return {
         ...state,
         favourites: [...updatedFavs],
