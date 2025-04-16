@@ -16,25 +16,41 @@ export interface DataStateTyping {
   };
   selectors: {
     search: {
+      parentNode: string;
       autocomplete?: {
-        parentSection: string;
         handleSubmit: string;
         handleClear: string;
         form: string;
         wrapper: string;
-        suggestions: string;
+        suggestions?: string;
       };
       manual?: any;
     };
-    noResults: string;
-    totalResults: string;
-    pagination: string;
-    sort?: string;
+    totalResults: {
+      parentNode: string;
+    };
+    facets: {
+      parentNode: string;
+      wrapper: string;
+    };
+    results: {
+      parentNode: string;
+      ulClassName: string;
+    };
+    pagination: { parentNode: string };
+    noResults?: { className?: string };
+    sort?: any;
   };
   templates: {
-    results: (result: any, getMeta: any) => ReactNode;
-    noResults: () => ReactNode;
-    totalResults: (totalResults: number, query: string) => ReactNode;
+    facets: Array<{
+      name: string;
+      type: string;
+      options: any;
+      displayLabel: string;
+    }>;
+    results: { content: (result: any, getMeta: any) => string };
+    noResults: { content: () => string };
+    totalResults?: { className?: string };
     search: {
       type: string;
       autocomplete?: {
@@ -56,18 +72,13 @@ export interface DataStateTyping {
     sort?: (selectedValue: any) => ReactNode;
     // A plain object for pagination-related templates and/or props.
     pagination: {
-      className: string;
-      muiProps: {
-        size: string;
-        controls: string[];
-        additionals: any[]; // Adjust this type if needed.
-      };
+      muiProps: { [key: string]: any };
     };
     skeleton: {
-      variant: string;
-      width: number;
-      height: number;
-      animation: string;
+      variant: "text" | "rectangular" | "rounded" | "circular";
+      width: number | string;
+      height: number | string;
+      animation: false | "pulse" | "wave";
     };
   };
   results?: Array<{
@@ -75,7 +86,7 @@ export interface DataStateTyping {
     liveUrl: string;
     title: string;
   }>;
-  networkRquestInProgress: { error: string; inProgress: boolean };
+  networkRequest: { error: string; inProgress: boolean };
   currentStart: number;
   nextStart: number | null;
   totalResults: number;

@@ -1,10 +1,49 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import { useState, useEffect } from "react";
 import { useDataDispatch, useDataState } from "../context/DataState";
 import extractFacetKey from "../helpers/extractFacetParam";
+import { createPortal } from "react-dom";
 
 const Facets = () => {
-  const { facets, selectedFacets, facetTypes } = useDataState();
+  const { facets, selectedFacets, selectors, templates } = useDataState();
+  const [container, setContainer] = useState<HTMLElement | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [activeFacets, setActiveFacets] = useState<any[]>([]);
   const dispatch = useDataDispatch();
+
+  useEffect(() => {
+    if (selectors.facets && selectors.facets.parentNode) {
+      const containerElement = document.querySelector(
+        selectors.facets.parentNode
+      );
+      if (containerElement instanceof HTMLElement) {
+        setContainer(containerElement);
+      }
+    }
+  }, [selectors.facets]);
+
+  useEffect(() => {
+    if (!templates.facets.length || !facets?.length) return;
+
+    const matchingFacets = facets
+      .filter((obj1) =>
+        templates.facets.some((obj2) => obj2.name === obj1.name)
+      )
+      .map((obj1) => {
+        const templateMatch = templates.facets.find(
+          (obj2) => obj2.name === obj1.name
+        );
+        return {
+          ...obj1,
+          type: templateMatch?.type,
+          additionalInfo: templateMatch,
+        };
+      });
+
+    if (matchingFacets && matchingFacets.length > 0) {
+      setActiveFacets(matchingFacets);
+    }
+  }, [templates.facets, facets]);
 
   const isSelected = (value: string) => {
     return selectedFacets.some((facet) => facet.facetValue === value);
@@ -49,18 +88,28 @@ const Facets = () => {
     }
   };
 
-  //You must have your facetTypes variable length match
-  // the number of facets returned from Funnelback.
-  return facets && facets.length > 0 && facetTypes.length === facets.length ? (
-    <section className="search__facets">
-      <h2>Facets</h2>
-      {facets.map((facet, i) => {
-        if (facetTypes[i] === "checkbox") {
+  interface FacetItem {
+    count: number;
+    data: string;
+    label: string;
+    selected: boolean;
+    toggleUrl: string;
+  }
+
+  const sortOptions = (options: Array<FacetItem>) => {
+    return options.sort((a, b) => a.label.localeCompare(b.label));
+  };
+
+  const facetsContent = (
+    <div className={`${selectors.facets.wrapper ?? "search__facets"} `}>
+      {activeFacets.map((facet, i) => {
+        if (facet.type === "checkbox") {
+          sortOptions(facet.allValues);
           return (
             <div className="facet checkbox" key={i}>
-              <h4>Facet Name: {facet.name}</h4>
-              <ul>
-                {facet.allValues.map((option, index) => (
+              <h4>{facet.additionalInfo.displayLabel}</h4>
+              <ol>
+                {facet.allValues.map((option: FacetItem, index: number) => (
                   <li key={`${option.label}-${index}`}>
                     <input
                       type="checkbox"
@@ -74,22 +123,22 @@ const Facets = () => {
                     <label htmlFor={option.label}>{option.label}</label>
                   </li>
                 ))}
-              </ul>
+              </ol>
             </div>
           );
-        } else if (facetTypes[i] === "select") {
+        } else if (facet.type === "select") {
           return (
             <div className="facet select" key={i}>
-              <h4>Facet Name: {facet.name}</h4>
+              <h4>{facet.additionalInfo.displayLabel}</h4>
               <select
                 id=""
                 onChange={(e) => onChangeHandler(e, "select")}
                 defaultValue=""
               >
-                {facet.allValues.map((option, optionIndex) => {
+                {facet.allValues.map((option: FacetItem, index: number) => {
                   return (
                     <option
-                      key={`${option.label}-${optionIndex}`}
+                      key={`${option.label}-${index}`}
                       value={option.toggleUrl}
                     >
                       {option.label}
@@ -99,12 +148,12 @@ const Facets = () => {
               </select>
             </div>
           );
-        } else if (facetTypes[i] === "radio") {
+        } else if (facet.type === "radio") {
           return (
             <div className="facet" key={i}>
-              <h4>Facet Name: {facet.name}</h4>
+              <h4>{facet.additionalInfo.displayLabel}</h4>
               <ul>
-                {facet.allValues.map((option) => (
+                {facet.allValues.map((option: FacetItem) => (
                   <li key={option.label}>
                     <input
                       onChange={(e) => onChangeHandler(e, "radio")}
@@ -123,8 +172,14 @@ const Facets = () => {
           return null;
         }
       })}
-    </section>
-  ) : null;
+    </div>
+  );
+
+  if (!container) {
+    return null;
+  }
+
+  return createPortal(facetsContent, container);
 };
 
 export default Facets;

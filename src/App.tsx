@@ -5,6 +5,10 @@ import buildQueryUrl from "./helpers/buildQueryUrl";
 import fetchData from "./helpers/fetchData";
 import "./styles/main.scss";
 import useSearchUpdater from "./hooks/useSearchUpdater";
+import TotalResults from "./components/TotalResults";
+import Facets from "./components/Facets";
+import Results from "./components/Results";
+import Pagination from "./components/Pagination";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function App({ fbConfig, templates, selectors }: any) {
@@ -58,7 +62,15 @@ function App({ fbConfig, templates, selectors }: any) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <Search />;
+  return (
+    <>
+      <Search />
+      <TotalResults />
+      <Facets />
+      <Results />
+      <Pagination />
+    </>
+  );
 }
 
 export default App;

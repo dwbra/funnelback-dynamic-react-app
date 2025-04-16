@@ -17,8 +17,8 @@ const fbConfigMap = new Map([
     "selectors",
     {
       search: {
+        parentNode: ".search",
         autocomplete: {
-          parentSection: "search",
           handleSubmit: "search-submit-handler",
           handleClear: "search-clear-handler",
           form: "search-form",
@@ -26,40 +26,81 @@ const fbConfigMap = new Map([
           suggestions: "search-suggestions",
         },
         manual: {
-          parentNode: "search",
           handleSubmit: "search-submit-handler",
+          form: "search-submit-handler",
           handleClear: "search-clear-handler",
+          inputField: "search-input",
         },
       },
-      pagination: ".pagination",
+      totalResults: {
+        parentNode: ".total-results",
+      },
+      facets: {
+        parentNode: ".facets",
+        wrapper: "facet-wrapper",
+      },
+      results: {
+        parentNode: ".results",
+        ulClassName: "custom-results",
+      },
+      pagination: {
+        parentNode: ".pagination",
+      },
+      noResults: {
+        className: "no-results",
+      },
     },
   ],
   [
     "templates",
     {
-      //MUI pagination props
       pagination: {
-        className: "mui-pagination",
         muiProps: {
+          sx: { "&.MuiPagination-root": { backgroundColor: "grey" } },
           size: "large",
-          controls: ["showFirstButton", "showLastButton"],
-          additionals: [],
+          showFirstButton: true,
+          showLastButton: true,
         },
       },
-      //MUI Skeleton props
       skeleton: {
-        className: "mui-skeleton",
         muiProps: {
-          variant: "rounded",
-          width: "100%",
-          height: "100%",
+          variant: "rectangular",
           animation: "pulse",
         },
       },
-      results: (result, getMeta) => {},
-      noResults: () => {},
-      totalResults: (totalResults, query) => {},
-      sort: (selectedValue) => {},
+      results: {
+        content: (result, getMeta) => {
+          return `
+          <li>
+            <div>
+              <h3>
+                ${getMeta(result, "title") ?? ""} ${getMeta(
+            result,
+            "firstName"
+          )}${" "}
+                ${getMeta(result, "lastName")}
+              </h3>
+              <p>jobTitle: ${getMeta(result, "jobTitle")}</p>
+              <p>Bio: ${getMeta(result, "biography")}</p>
+            </div>
+          </li>
+        `;
+        },
+      },
+      totalResults: {
+        className: "custom-total-results",
+      },
+      facets: [
+        {
+          name: "LastNameInitial",
+          type: "checkbox",
+          options: {
+            singleChoice: false,
+            facetsRestricted: true,
+          },
+          displayLabel: "Last Initial",
+        },
+      ],
       search: {
         type: "manual",
         autocomplete: {
@@ -79,14 +120,12 @@ const fbConfigMap = new Map([
         manual: {
           content: () => {
             return `
-          <section class="search">
             <h2>Staff Directory</h2>
-            <section class="search__form">
-              <form id="search-form">
+              <form id="search-form" class="search-submit-handler">
                 <div>
                   <input 
                     type="text"
-                    id="search-input" 
+                    class="search-input"
                     name="searchquery"
                     value=""
                     placeholder="Search by title" />
@@ -95,21 +134,25 @@ const fbConfigMap = new Map([
               <button 
                 type="button" 
                 id="fbSubmitHandler" 
-                class="search__form--submit searchSubmitHandler">
+                class="search-submit-handler">
                 Submit
               </button>
               <button 
                 type="button" 
                 id="fbClickHandler" 
-                class="search__form--clear">
+                class="search-clear-handler">
                 Clear
               </button>
-            </section>
-          </section>
-        `;
+            `;
           },
         },
       },
+      noResults: {
+        content: () => {
+          return `<h3>No serches match your query try again!</h3>`;
+        },
+      },
+      sort: (selectedValue) => {},
     },
   ],
 ]);

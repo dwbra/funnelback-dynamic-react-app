@@ -1,17 +1,20 @@
 import { useState, useEffect, SyntheticEvent } from "react";
-import { useDataDispatch, useDataState } from "../../../context/DataState";
-import fetchSuggestions from "../../../helpers/fetchSuggestions";
-import useDebounce from "../../../hooks/useDebounce";
+import { createPortal } from "react-dom";
+import { useDataState, useDataDispatch } from "../context/DataState";
+import fetchSuggestions from "../helpers/fetchSuggestions";
+import useDebounce from "../hooks/useDebounce";
 import { Autocomplete as AutocompleteMui, TextField } from "@mui/material";
-import purify from "../../../helpers/purify";
+import DOMPurify from "dompurify";
 
-const Autocomplete = () => {
+const Autocomplete: React.FC = () => {
   const dispatch = useDataDispatch();
   const { fbConfig, templates, selectors } = useDataState();
   const [localQuery, setLocalQuery] = useState("");
-  const [localSuggestions, setLocalSuggestions] = useState([]);
+  const [localSuggestions, setLocalSuggestions] = useState<string[]>([]);
+  const [container, setContainer] = useState<HTMLElement | null>(null);
   const debouncedQuery = useDebounce(localQuery, 300);
 
+  // Fetch suggestions when query changes.
   useEffect(() => {
     if (fbConfig.collection && !fbConfig.suggestUrl) {
       console.warn("No suggestUrl is set.");
@@ -25,7 +28,7 @@ const Autocomplete = () => {
       setLocalSuggestions(suggestions);
     };
 
-    // Only call fetch if the debouncedQuery is not empty
+    // Only fetch suggestions if the debounced query is not empty.
     if (debouncedQuery.length > 0) {
       fetchLocalSuggestions();
     }
@@ -34,7 +37,7 @@ const Autocomplete = () => {
 
   const handleSubmit = (event: SyntheticEvent<Element, Event>) => {
     event.preventDefault();
-    console.log("submitted");
+    console.log("submitted with query:", localQuery);
     dispatch({
       type: "setQuery",
       query: localQuery,
@@ -49,24 +52,20 @@ const Autocomplete = () => {
     });
   };
 
-  // useEffect(() => {
-  //   console.log(localQuery);
-  // });
-
-  const autocompleteTemplate = templates.search.autocomplete;
+  // Retrieve autocomplete selectors and template from global state.
   const autoCompleteSelectors = selectors.search.autocomplete;
+  const autocompleteTemplate = templates.search.autocomplete;
 
-  return (
-    <section
-      className={autoCompleteSelectors?.parentSection ?? "autocomplete-section"}
-    >
-      {autocompleteTemplate?.title ? (
+  // Build the JSX content to be portaled.
+  const jsxContent = (
+    <div className={"autocomplete"}>
+      {autocompleteTemplate?.title && (
         <h2
           dangerouslySetInnerHTML={{
-            __html: purify(`${autocompleteTemplate?.title}`),
+            __html: DOMPurify.sanitize(autocompleteTemplate.title),
           }}
-        ></h2>
-      ) : null}
+        />
+      )}
       <form
         onSubmit={handleSubmit}
         className={autoCompleteSelectors?.form ?? "autocomplete-form"}
@@ -77,25 +76,16 @@ const Autocomplete = () => {
           <AutocompleteMui
             options={localSuggestions}
             value={localQuery}
-            onInputChange={(
-              _event: React.SyntheticEvent,
-              value: string,
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              _reason: string
-            ) => {
-              setLocalQuery(value);
-            }}
-            onChange={(_event, value: string) => {
-              // For freeSolo, value is a string (or null)
-              setLocalQuery(value);
+            onInputChange={(_event, value: string) => setLocalQuery(value)}
+            onChange={(_event, value: string, reason: string) => {
+              if (reason === "clear") {
+                setLocalQuery("");
+              } else {
+                setLocalQuery(value);
+              }
             }}
             renderInput={(params) => (
-              <>
-                <TextField
-                  {...params}
-                  {...autocompleteTemplate?.inputElement}
-                />
-              </>
+              <TextField {...params} {...autocompleteTemplate?.inputElement} />
             )}
             {...autocompleteTemplate?.muiProps}
           />
@@ -119,8 +109,28 @@ const Autocomplete = () => {
       >
         {autocompleteTemplate?.clearBtnText ?? "Clear"}
       </button>
-    </section>
+    </div>
   );
+
+  // Use useEffect to wait for the DOM to be ready and set the container.
+  useEffect(() => {
+    if (selectors.search && selectors.search.parentNode) {
+      const containerElement = document.querySelector(
+        selectors.search.parentNode
+      );
+      if (containerElement instanceof HTMLElement) {
+        setContainer(containerElement);
+      }
+    }
+  }, [selectors.search]);
+
+  // Until the container is ready, return null so nothing is rendered.
+  if (!container) {
+    return null;
+  }
+
+  // Return the portal instead of direct JSX.
+  return createPortal(jsxContent, container);
 };
 
 export default Autocomplete;

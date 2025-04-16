@@ -25,7 +25,8 @@ const dataStateReducer = (state: DataStateTyping, action: any) => {
     case "setNetworkRequest":
       return {
         ...state,
-        setNetworkRequest: {
+        networkRequest: {
+          ...state.networkRequest,
           error: action.error,
           inProgress: action.inProgress,
         },

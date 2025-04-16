@@ -1,10 +1,30 @@
 import { useEffect, useState } from "react";
 import MUIPagination from "@mui/material/Pagination";
 import { useDataState, useDataDispatch } from "../context/DataState";
+import { createPortal } from "react-dom";
 
 const Pagination = () => {
-  const { fbConfig, currentStart, totalResults, results } = useDataState();
+  const [container, setContainer] = useState<HTMLElement | null>(null);
+  const {
+    fbConfig,
+    currentStart,
+    totalResults,
+    results,
+    selectors,
+    templates,
+  } = useDataState();
   const dispatch = useDataDispatch();
+
+  useEffect(() => {
+    if (selectors.pagination && selectors.pagination.parentNode) {
+      const containerElement = document.querySelector(
+        selectors.pagination.parentNode
+      );
+      if (containerElement instanceof HTMLElement) {
+        setContainer(containerElement);
+      }
+    }
+  }, [selectors.pagination]);
 
   // Local state to track pagination values synchronously
   const [currentPage, setCurrentPage] = useState(1);
@@ -38,22 +58,20 @@ const Pagination = () => {
     return null;
   }
 
-  return (
-    results &&
-    results?.length > 0 && (
-      <section className="search__pagination">
-        <MUIPagination
-          onChange={(_, page) => handleChange(page)}
-          page={currentPage}
-          count={totalPageCount}
-          size="large"
-          showFirstButton
-          showLastButton
-          variant="outlined"
-        />
-      </section>
-    )
+  const content = results && results?.length > 0 && (
+    <MUIPagination
+      onChange={(_, page) => handleChange(page)}
+      page={currentPage}
+      count={totalPageCount}
+      {...templates.pagination.muiProps}
+    />
   );
+
+  if (!container) {
+    return null;
+  }
+
+  return createPortal(content, container);
 };
 
 export default Pagination;

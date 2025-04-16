@@ -1,16 +1,17 @@
 import { useDataState } from "../context/DataState";
+import DOMPurify from "dompurify";
+import parse from "html-react-parser";
 
 const NoResults = () => {
-  const { query } = useDataState();
+  const { templates, selectors } = useDataState();
   return (
-    query && (
-      <section className="search__no-results">
-        <p>
-          There are no results for your search. Please try entering another
-          image title.
-        </p>
-      </section>
-    )
+    <section
+      className={`${selectors?.noResults?.className ?? "search__no-results"}`}
+    >
+      {parse(DOMPurify.sanitize(templates.noResults.content())) ?? (
+        <p>There are no results for your search.</p>
+      )}
+    </section>
   );
 };
 

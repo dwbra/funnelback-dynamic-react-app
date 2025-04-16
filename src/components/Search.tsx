@@ -1,6 +1,6 @@
 import { useDataState } from "../context/DataState";
-import Autocomplete from "./atoms/search/Autocomplete";
-import ManualSearch from "./atoms/search/ManualSearch";
+import Autocomplete from "./Autocomplete";
+import ManualSearch from "./ManualSearch";
 
 const Search = () => {
   const { templates } = useDataState();
