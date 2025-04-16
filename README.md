@@ -2,125 +2,224 @@
 
 ## 🚀 React + TypeScript + Vite + Funnelback
 
-This repository showcases a modern and efficient way to build a **React** application for integrating with **Squiz Matrix** and **Funnelback**. It compiles clean, minimal **CSS and JavaScript** files designed for Matrix consumption.
+This repository now uses a completely dynamic configuration model via a **configMap.js** file. By splitting configuration into separate mappings for Funnelback settings, DOM selectors, and dynamic HTML templates, you can easily customize every aspect of your search UI on the client side without having to modify core React code.
 
-By leveraging Matrix’s ability to generate XML and Funnelback’s flexibility with that format, this approach streamlines building powerful search UIs with minimal friction.
-
----
-
-## 📦 XML Processing & Funnelback Configuration
-
-Funnelback is optimized for indexing **XML**, which allows it to efficiently process thousands of structured records. We use **Asset Listings** in Matrix to construct valid XML for Funnelback to crawl.
-
-### 🔧 XML Setup Steps
-
-1. **Create an Asset Listing**  
-   Structure your output with proper XML, including a declaration:  
-   `<?xml version="1.0" encoding="UTF-8"?>`
-
-2. **Generate an XML File**  
-   Store the structured XML in a separate asset.
-
-3. **Automate XML Updates**
-
-   - Create a **trigger** using the **metadata time method** (based on the cron job).
-   - Use `asset_contents_raw` to update the XML file contents from the Asset Listing.
-
-4. **Fix URL Path Issues**
-
-   - Disable **"Allow Unrestricted Access"** to prevent URLs using `/__data`.
-   - This ensures proper caching behavior.
-
-5. **Pass XML to Funnelback**
-   - Use the URL of the XML file as the **Start URL** in Funnelback’s crawler settings.
-
-### ⚙️ Funnelback Configuration
-
-Funnelback setup only requires two core plugins:
-
-- **XML & HTML Splitting** — Configure this to match your XML structure.
-- **Autocomplete** — Enable after indexing completes.
-
-Don’t forget to set up metadata mappings to match your XML schema.
-
-🔗 **Example Configuration:**  
-You can reference an example from this DXP tenant:  
-[NTU Search Packages – Funnelback](https://dxp02-uk-admin.funnelback.squiz.cloud/d/client/ntu/search-packages/ntu~sp-image-search/)  
-Check the **data source** section to align your own configuration.
+This repo demonstrates an efficient way to integrate **Squiz Matrix** and **Funnelback** with a React frontend. It compiles clean, minimal CSS and JavaScript files that are ideal for consumption by Matrix.
 
 ---
 
-## ⚛️ React App Overview
+## 📦 Dynamic Configuration Mapping
 
-This frontend is built with:
+### How It Works
 
-- **React (TypeScript)**
-- **Material UI (MUI)**
-- **Vite** for lightning-fast development
+Rather than hardcoding selectors, HTML snippets, and MUI props into your React components, we now define a dynamic configuration in **configMap.js**. This file exposes a Map (attached to `window.fbConfigMap`) with keys for:
 
-### 🌟 Design Principles
+- **fbConfig:**  
+  Contains search endpoints, collection names, profiles, and other Funnelback parameters (such as `searchUrl`, `suggestUrl`, `collection`, and `additionalParams`). These values drive API requests and search logic in the React app.
 
-- **Pure Functions** for helpers
-- **Axios utilities** for all API requests
-- **Components** drive all state and view logic
-- **React Context** for global state
+- **selectors:**  
+  Contains CSS selectors for each section of your UI. For example, it defines where the search block, facets, results list, pagination, and total results areas are located in the DOM. Each key (such as `search`, `totalResults`, `facets`, `results`, `pagination`, and `noResults`) includes properties like `parentNode` (or specific class names) that the app queries and uses to portal content.
 
-### ✅ Features
+- **templates:**  
+  Contains configuration for how each part of the UI should be rendered. Templates may include:
+  - **results:** A function (or a string returned by a function) that produces an HTML string for each search result.
+  - **pagination:** An object that carries inline MUI props to customize the Pagination component (for example, using inline object literals for style overrides or class names).
+  - **facets, search, totalResults, noResults, and skeleton:** Templates that either return HTML strings or objects with customization options.
+  - For example, the **search** template includes sub-templates for both `autocomplete` and `manual` search modes. Each returns HTML as a string. These strings are later sanitized (using DOMPurify) and parsed into React nodes (via html-react-parser) so that dynamic event handlers and React state integrations occur seamlessly.
 
-- 🔍 **Autocomplete search box**
-- 📄 **Results display with pagination**
-- ⭐ **Best Bets & metadata field mappings**
-- 🧩 Extendable **faceted search support**
+### configMap.js Example
 
-The `index.html` file shows how to structure the target `<div>` in Matrix to pass props directly into the React app for search requests.
+```js
+const fbConfigMap = new Map([
+  [
+    "fbConfig",
+    {
+      searchUrl: "https://ual-search.funnelback.squiz.cloud/s/search.json",
+      suggestUrl: "https://ual-search.funnelback.squiz.cloud/s/suggest.json",
+      collection: "ual~sp-people-prod",
+      profile: "_default",
+      numRanks: "12",
+      defaultSort: "metalastName",
+      defaultQuery: "!FunDoesNotExist:PadreNull",
+      scopedFacet: "f.Type|type=Staff",
+      additionalParams: [{ "f.LastNameInitial|lastInitial": "B" }],
+    },
+  ],
+  [
+    "selectors",
+    {
+      search: {
+        parentNode: ".search", // The container for search elements.
+        autocomplete: {
+          handleSubmit: "search-submit-handler",
+          handleClear: "search-clear-handler",
+          form: "search-form",
+          wrapper: "search-wrapper",
+          suggestions: "search-suggestions",
+        },
+        manual: {
+          handleSubmit: "search-submit-handler",
+          form: "search-submit-handler",
+          handleClear: "search-clear-handler",
+          inputField: "search-input",
+        },
+      },
+      totalResults: {
+        parentNode: ".total-results",
+      },
+      facets: {
+        parentNode: ".facets",
+        wrapper: "facet-wrapper",
+      },
+      results: {
+        parentNode: ".results",
+        ulClassName: "custom-results",
+      },
+      pagination: {
+        parentNode: ".pagination",
+      },
+      noResults: {
+        className: "no-results",
+      },
+    },
+  ],
+  [
+    "templates",
+    {
+      pagination: {
+        muiProps: {
+          sx: { "&.MuiPagination-root": { backgroundColor: "grey" } },
+          size: "large",
+          showFirstButton: true,
+          showLastButton: true,
+        },
+      },
+      skeleton: {
+        muiProps: {
+          variant: "rectangular",
+          animation: "pulse",
+        },
+      },
+      results: {
+        content: (result, getMeta) => {
+          return `
+          <li>
+            <div>
+              <h3>
+                ${getMeta(result, "title") ?? ""} ${
+            getMeta(result, "firstName") ?? ""
+          } 
+                ${getMeta(result, "lastName") ?? ""}
+              </h3>
+              <p>jobTitle: ${getMeta(result, "jobTitle")}</p>
+              <p>Bio: ${getMeta(result, "biography")}</p>
+            </div>
+          </li>
+          `;
+        },
+      },
+      totalResults: {
+        className: "custom-total-results",
+      },
+      facets: [
+        {
+          name: "LastNameInitial",
+          type: "checkbox",
+          options: {
+            singleChoice: false,
+            facetsRestricted: true,
+          },
+          displayLabel: "Last Initial",
+        },
+      ],
+      search: {
+        type: "manual",
+        autocomplete: {
+          title: "Daniels Header",
+          inputElement: {
+            className: "search-input",
+            name: "daniels-auto",
+            placeholder: "Daniels new auto complete",
+            title: "daniels-auto",
+          },
+          submitBtnText: "Submit New",
+          clearBtnText: "Clear New",
+          muiProps: {
+            freeSolo: true,
+          },
+        },
+        manual: {
+          content: () => {
+            return `
+            <h2>Staff Directory</h2>
+              <form id="search-form" class="search-submit-handler">
+                <div>
+                  <input 
+                    type="text"
+                    class="search-input"
+                    name="searchquery"
+                    value=""
+                    placeholder="Search by title" />
+                </div>
+              </form>
+              <button 
+                type="button" 
+                id="fbSubmitHandler" 
+                class="search-submit-handler">
+                Submit
+              </button>
+              <button 
+                type="button" 
+                id="fbClickHandler" 
+                class="search-clear-handler">
+                Clear
+              </button>
+            `;
+          },
+        },
+      },
+      noResults: {
+        content: () => `<h3>No searches match your query—try again!</h3>`,
+      },
+      sort: (selectedValue) => {},
+    },
+  ],
+]);
 
----
+window.fbConfigMap = fbConfigMap;
+```
 
-## 🛠️ DevOps & Deployment
+## ⚛️ React App Integration
 
-This repo follows the convention used in:  
-🔗 [Squiz Boilerplates – Kernel](https://gitlab.squiz.net/services/boilerplates/kernel)
+The React application reads from this dynamic map (attached to `window.fbConfigMap` or imported as a module) and uses these settings throughout its components:
 
-### 🚧 GitLab CI/CD Setup
+- **Selectors** are used to query specific DOM nodes for portaling content, wiring up event handlers, and positioning dynamic UI elements.
 
-For guidance on CI/CD pipelines and Git Bridge, refer to:  
-🔗 [How to Set Up a Git Bridge](https://matrix.squiz.net/tutorials/2018/how-to-set-up-a-git-bridge#configuring-the-repository)
+- **Templates** drive the dynamic rendering of HTML (for components such as Manual Search or Results). The HTML strings generated in templates are sanitized (using DOMPurify) and then parsed into React nodes (via html-react-parser). This allows your app to dynamically inject custom layouts as defined in your config file.
 
-### 🔄 Modifications in This Repo
+- **MUI Props** for components (e.g., Pagination) are defined in the configuration file and spread into components via the JSX spread operator. This ensures that the client can override defaults without modifying the source code.
 
-- ✅ **Linting removed** for simplicity
-- ✅ Default **deploy branch**: `deploy/prod`
-- ✅ Uses standard **GitLab CI/CD config**, or you can add a custom one
+For example, your Pagination component now looks up its container (as defined in selectors) and then renders the MUI Pagination using the inline props defined in the template’s pagination section. Similarly, the Manual Search component parses its HTML (from `templates.search.manual.content`) into React elements and attaches event handlers based on `selectors.search.manual`.
 
----
+## 🛠️ Development Workflow
+
+- **Dynamic Config Updates:**  
+  All UI elements, class names, and component properties are now centralized in `configMap.js`, allowing you to adjust the UI dynamically from a single configuration file.
+
+- **State & DOM Integration:**  
+  React components use portals to insert dynamic HTML into designated DOM containers (identified via selectors). The app sanitizes the HTML (using DOMPurify) and parses it into React elements (via html-react-parser) so that state management and event handling work as expected.
+
+- **Custom Client-Side Logic:**  
+  Helper functions (e.g., `getMeta`) can be exposed to the configuration. Clients can write dynamic rendering logic in plain JavaScript—returning HTML strings that are later parsed into React elements—without modifying the core application code.
 
 ## 🧪 Getting Started
 
-To begin local development:
+To begin local development, run the following commands:
 
 ```bash
 # Install dependencies
 npm install
 
-# Start the dev server
+# Start the development server
 npm run dev
 ```
-
-## 📋 Final Setup Instructions
-
-Once the project is running, follow these steps to tailor it to your data model and environment:
-
-- ✍️ **Update the typing** in `DataState.tsx` to match the structure of your expected XML data.
-- 🛠️ **Update the typings and layout** in `Results.tsx` and `Result.tsx` to match your client’s content model.
-- 🧱 **Modify the HTML structure** in `Results.tsx` as needed for layout and design.
-- 🎛️ **Adjust** `Facets.tsx` to render your facet UI.
-- 🔢 **Set the** `facetTypes` **array** in `DataState.tsx` to define the order your facets appear in.
-- 🎨 **Add any custom SCSS** if required for styling.
-- 📦 **Build the final output:**
-
-```bash
-npm run build
-```
-
-- 📁 **Upload** the output files (typically found in `dist/`) to **Squiz Matrix**.
-- 🧩 **Embed the assets** in a Matrix page — and voilà, your search app is live!
