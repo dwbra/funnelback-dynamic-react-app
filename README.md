@@ -41,8 +41,7 @@ const fbConfigMap = new Map([
       numRanks: "12",
       defaultSort: "metalastName",
       defaultQuery: "!FunDoesNotExist:PadreNull",
-      scopedFacet: "f.Type|type=Staff",
-      additionalParams: [{ "f.LastNameInitial|lastInitial": "B" }],
+      additionalParams: [{ key: "f.Type|type", value: "Staff" }],
     },
   ],
   [
