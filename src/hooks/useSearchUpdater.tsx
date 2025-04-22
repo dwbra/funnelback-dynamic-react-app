@@ -7,12 +7,16 @@ const useSearchUpdater = () => {
   const { fbConfig, selectedFacets, startRank, query } = useDataState();
   const dispatch = useDataDispatch();
 
+  const delay = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
   useEffect(() => {
     if (!fbConfig.collection) return;
 
     const fetchAndUpdate = async () => {
       dispatch({ type: "setNetworkRequest", inProgress: true, error: "" });
 
+      await delay(1000);
       try {
         const freshQuery = buildQueryUrl(fbConfig.searchUrl, {
           fbConfig,
