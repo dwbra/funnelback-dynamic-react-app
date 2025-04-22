@@ -15,6 +15,7 @@ interface QueryUrl {
     facetKey: string;
     facetValue: string;
   }>;
+  sort?: string;
 }
 
 const buildQueryUrl = (
@@ -31,6 +32,7 @@ const buildQueryUrl = (
     query,
     startRank,
     selectedFacets,
+    sort,
   }: QueryUrl
 ) => {
   const params = new URLSearchParams();
@@ -61,6 +63,10 @@ const buildQueryUrl = (
     additionalParams.forEach(({ key, value }) => {
       params.set(key, value);
     });
+  }
+
+  if (sort) {
+    params.set("sort", sort);
   }
 
   let queryString = params.toString();

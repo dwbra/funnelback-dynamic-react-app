@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { ReactNode } from "react";
 
 export interface DataStateTyping {
   fbConfig: {
@@ -68,7 +66,7 @@ export interface DataStateTyping {
         content: () => string | undefined;
       };
     };
-    sort?: (selectedValue: any) => ReactNode;
+    sort?: { content: () => string | undefined };
     // A plain object for pagination-related templates and/or props.
     pagination: {
       muiProps: { [key: string]: any };
@@ -115,4 +113,5 @@ export interface DataStateTyping {
     key: string;
   }>;
   favouriteKeys: Array<string>;
+  sort: string;
 }

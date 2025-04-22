@@ -4,11 +4,8 @@ import buildQueryUrl from "../helpers/buildQueryUrl";
 import fetchData from "../helpers/fetchData";
 
 const useSearchUpdater = () => {
-  const { fbConfig, selectedFacets, startRank, query } = useDataState();
+  const { fbConfig, selectedFacets, startRank, query, sort } = useDataState();
   const dispatch = useDataDispatch();
-
-  const delay = (ms: number) =>
-    new Promise((resolve) => setTimeout(resolve, ms));
 
   useEffect(() => {
     if (!fbConfig.collection) return;
@@ -16,13 +13,13 @@ const useSearchUpdater = () => {
     const fetchAndUpdate = async () => {
       dispatch({ type: "setNetworkRequest", inProgress: true, error: "" });
 
-      await delay(1000);
       try {
         const freshQuery = buildQueryUrl(fbConfig.searchUrl, {
           fbConfig,
           selectedFacets,
           startRank,
           query,
+          sort,
         });
 
         const { results, currentStart, nextStart, totalResults } =
@@ -45,7 +42,7 @@ const useSearchUpdater = () => {
 
     fetchAndUpdate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedFacets, startRank, query, fbConfig]);
+  }, [selectedFacets, startRank, query, fbConfig, sort]);
 };
 
 export default useSearchUpdater;

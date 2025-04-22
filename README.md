@@ -180,7 +180,19 @@ const fbConfigMap = new Map([
       noResults: {
         content: () => `<h3>No searches match your query—try again!</h3>`,
       },
-      sort: (selectedValue) => {},
+      sort: {
+        content: () =>
+          `<div class="sort-fb">
+          <label for="sort">Sort by:</label>
+          <select id="sort" name="sort">
+            <option value="">Relevance</option>
+            <option value="date">Newest</option>
+            <option value="-date">Oldest</option>
+            <option value="title">Title A–Z</option>
+            <option value="-title">Title Z–A</option>
+          </select>
+        </div>`,
+      },
     },
   ],
 ]);

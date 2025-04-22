@@ -27,6 +27,7 @@ const defaultState: DataStateTyping = {
     facets: [],
     results: { content: () => "" },
     noResults: { content: () => "" },
+    sort: { content: () => "" },
     totalResults: {},
     search: { type: "autocomplete" },
     pagination: {
@@ -50,6 +51,7 @@ const defaultState: DataStateTyping = {
   networkRequest: { error: "", inProgress: false },
   favourites: [],
   favouriteKeys: ["test"],
+  sort: "",
 };
 
 export default defaultState;

@@ -48,6 +48,10 @@ const fbConfigMap = new Map([
       noResults: {
         className: "no-results",
       },
+      sort: {
+        parentNode: ".sort",
+        handleChange: "sort-fb",
+      },
     },
   ],
   [
@@ -151,7 +155,20 @@ const fbConfigMap = new Map([
           return `<h3>No serches match your query try again!</h3>`;
         },
       },
-      sort: (selectedValue) => {},
+      sort: {
+        content: () => {
+          return `
+          <label for="sort">Sort by:</label>
+            <select name="sort" class="sort-fb">
+              <option value="">Relevance</option>
+              <option value="date">Newest</option>
+              <option value="adate">Oldest</option>
+              <option value="title">Title A–Z</option>
+              <option value="dtitle">Title Z–A</option>
+            </select>
+          `;
+        },
+      },
     },
   ],
 ]);

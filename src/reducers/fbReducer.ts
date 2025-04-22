@@ -17,6 +17,11 @@ const dataStateReducer = (state: DataStateTyping, action: any) => {
         ...state,
         results: action.results,
       };
+    case "setSort":
+      return {
+        ...state,
+        sort: action.sort,
+      };
     case "setStartRank":
       return {
         ...state,
