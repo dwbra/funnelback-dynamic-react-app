@@ -11,7 +11,6 @@ export interface DataStateTyping {
     numRanks: string;
     defaultSort: string;
     defaultQuery: string;
-    scopedFacet: string;
     additionalParams: Array<Record<string, string>>;
   };
   selectors: {

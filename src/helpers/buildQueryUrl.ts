@@ -7,6 +7,7 @@ interface QueryUrl {
     profile: string;
     numRanks: string;
     defaultSort: string;
+    additionalParams?: Array<Record<string, string>>;
   };
   query?: string;
   startRank?: string;
@@ -19,7 +20,14 @@ interface QueryUrl {
 const buildQueryUrl = (
   url: string,
   {
-    fbConfig: { collection, defaultQuery, profile, numRanks, defaultSort },
+    fbConfig: {
+      collection,
+      defaultQuery,
+      profile,
+      numRanks,
+      defaultSort,
+      additionalParams,
+    },
     query,
     startRank,
     selectedFacets,
@@ -46,6 +54,12 @@ const buildQueryUrl = (
   if (selectedFacets && selectedFacets.length > 0) {
     selectedFacets.forEach(({ facetKey, facetValue }) => {
       params.append(facetKey, facetValue);
+    });
+  }
+
+  if (additionalParams && additionalParams.length > 0) {
+    additionalParams.forEach(({ key, value }) => {
+      params.set(key, value);
     });
   }
 

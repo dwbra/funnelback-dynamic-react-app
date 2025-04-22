@@ -27,6 +27,12 @@ const funnelbackReactApp = () => {
   }
 
   const container = document.querySelector(".react__ual-staff");
+
+  if (!container) {
+    console.error("React container not found in the DOM.");
+    return;
+  }
+
   if (container && fbConfig && templates && selectors) {
     createRoot(container).render(
       <DataStateProvider>

@@ -10,7 +10,6 @@ const defaultState: DataStateTyping = {
     numRanks: "",
     defaultQuery: "",
     defaultSort: "",
-    scopedFacet: "",
     additionalParams: [],
   },
   selectors: {
