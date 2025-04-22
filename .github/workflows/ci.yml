@@ -1,0 +1,61 @@
+# File: .github/workflows/ci.yml
+name: CI on main
+
+# 1) Trigger only when main is updated
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  # 2) Build job
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/
+
+  # 3) Deploy job
+  deploy:
+    name: Deploy dist to deploy/prod
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (for pushing)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # required so we can push new branches
+
+      - name: Download dist
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist/
+
+      - name: Commit & push dist
+        working-directory: dist
+        run: |
+          git init
+          git checkout -b deploy/prod
+          git add -f .
+          git commit -m "Deploy ${{ github.sha }}"
+          git remote add origin https://${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git push --force origin deploy/prod
