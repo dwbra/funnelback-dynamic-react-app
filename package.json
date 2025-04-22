@@ -1,7 +1,6 @@
 {
-  "name": "ntu-image-search",
-  "private": true,
-  "version": "0.0.0",
+  "name": "funnelback-dynamic-react-app",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
