@@ -80,6 +80,10 @@ const fbConfigMap = new Map([
       noResults: {
         className: "no-results",
       },
+      sort: {
+        parentNode: ".sort",
+        handleChange: "sort-fb",
+      },
     },
   ],
   [
