@@ -11,25 +11,38 @@ const funnelbackReactApp = () => {
   const templates = configMap ? configMap.get("templates") : null;
   const selectors = configMap ? configMap.get("selectors") : null;
 
+  if (!selectors) {
+    console.error(
+      "FB Dynamic App - Global configuration 'selectors' not found."
+    );
+    return;
+  }
+
   if (!fbConfig) {
-    console.error("Global configuration 'fbConfig' not found.");
+    console.error(
+      "FB Dynamic App - Global configuration 'fbConfig' not found."
+    );
     return;
   }
 
   if (!templates) {
-    console.error("Global configuration 'templates' not found.");
+    console.error(
+      "FB Dynamic App - Global configuration 'templates' not found."
+    );
     return;
   }
 
-  if (!selectors) {
-    console.error("Global configuration 'selectors' not found.");
+  if (!selectors.initialiserElement) {
+    console.error(
+      "FB Dynamic App - Global configuration 'selectors.initialiserElement' has not been set."
+    );
     return;
   }
 
-  const container = document.querySelector(".react__ual-staff");
+  const container = document.querySelector(selectors.initialiserElement);
 
   if (!container) {
-    console.error("React container not found in the DOM.");
+    console.error("FB Dynamic App - React container not found in the DOM.");
     return;
   }
 

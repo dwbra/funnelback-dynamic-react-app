@@ -15,6 +15,7 @@ const fbConfigMap = new Map([
   [
     "selectors",
     {
+      initialiserElement: ".react__ual-staff",
       search: {
         parentNode: ".search",
         autocomplete: {

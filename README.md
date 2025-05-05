@@ -47,6 +47,7 @@ const fbConfigMap = new Map([
   [
     "selectors",
     {
+      initialiserElement: ".react__ual-staff",
       search: {
         parentNode: ".search", // The container for search elements.
         autocomplete: {
@@ -186,9 +187,9 @@ const fbConfigMap = new Map([
       },
       sort: {
         content: () =>
-          `<div class="sort-fb">
+          `<div class="sort-wrapper">
           <label for="sort">Sort by:</label>
-          <select id="sort" name="sort">
+          <select class="sort-fb" name="sort">
             <option value="">Relevance</option>
             <option value="date">Newest</option>
             <option value="-date">Oldest</option>
