@@ -1,5 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+import { ReactNode } from "react";
+
+export interface FacetItem {
+  count: number;
+  data: string;
+  label: string;
+  selected: boolean;
+  toggleUrl: string;
+}
+
+interface FacetTemplateData {
+  name: string;
+  displayLabel: string;
+  allValues: FacetItem[];
+}
+
 export interface DataStateTyping {
   fbConfig: {
     searchUrl: string;
@@ -11,6 +27,7 @@ export interface DataStateTyping {
     defaultQuery: string;
     additionalParams: Array<Record<string, string>>;
   };
+
   selectors: {
     search: {
       parentNode: string;
@@ -23,9 +40,7 @@ export interface DataStateTyping {
       };
       manual?: any;
     };
-    totalResults: {
-      parentNode: string;
-    };
+    totalResults: { parentNode: string };
     facets: {
       parentNode: string;
       wrapper: string;
@@ -38,17 +53,49 @@ export interface DataStateTyping {
     noResults?: { className?: string };
     sort?: any;
   };
+
   templates: {
+    // Facet templates
     facets: Array<{
       name: string;
       type: string;
       options: any;
       displayLabel: string;
     }>;
-    results: { content: (innerHtml: any) => string };
-    result: { content: (result: any, getMeta: any) => string };
-    noResults: { content: () => string };
+
+    facetCheckbox: {
+      content: (args: {
+        facet: FacetTemplateData;
+        /** mark checkbox checked/unchecked */
+        isSelected: (value: string) => boolean;
+      }) => string;
+    };
+
+    facetSelect: {
+      content: (args: {
+        facet: FacetTemplateData & { selectedValue: string };
+      }) => string;
+    };
+
+    facetRadio: {
+      content: (args: {
+        facet: FacetTemplateData & { selectedValue: string };
+      }) => string;
+    };
+
+    // Result templates
+    results: {
+      content: (innerHtml: ReactNode) => string;
+    };
+    result: {
+      content: (result: any, getMeta: any) => string;
+    };
+    noResults: {
+      content: () => string;
+    };
     totalResults?: { className?: string };
+
+    // Search templates
     search: {
       type: string;
       autocomplete?: {
@@ -67,8 +114,12 @@ export interface DataStateTyping {
         content: () => string | undefined;
       };
     };
-    sort?: { content: () => string | undefined };
-    // A plain object for pagination-related templates and/or props.
+
+    sort?: {
+      content: () => string | undefined;
+    };
+
+    // Pagination & skeleton
     pagination: {
       muiProps: { [key: string]: any };
     };
@@ -79,41 +130,46 @@ export interface DataStateTyping {
       animation: false | "pulse" | "wave";
     };
   };
+
   results?: Array<{
-    listMetadata: Record<string, []>;
+    listMetadata: Record<string, any[]>;
     liveUrl: string;
     title: string;
     rank: number;
   }>;
-  networkRequest: { error: string; inProgress: boolean };
+
+  networkRequest: {
+    error: string;
+    inProgress: boolean;
+  };
+
   currentStart: number;
   nextStart: number | null;
   totalResults: number;
   query?: string;
+
   facets?: Array<{
-    allValues: Array<{
-      label: string;
-      count: number;
-      data: string;
-      selected: boolean;
-      toggleUrl: string;
-    }>;
+    allValues: FacetItem[];
     name: string;
-    order: Array<string>;
+    order: string[];
     selected: boolean;
     selectionType: string;
     unselectAllUrl: string;
   }>;
+
   selectedFacets: Array<{
     facetKey: string;
     facetValue: string;
     facetType: string;
   }>;
+
   startRank: string;
+
   favourites: Array<{
     data: any;
     key: string;
   }>;
-  favouriteKeys: Array<string>;
+  favouriteKeys: string[];
+
   sort: string;
 }

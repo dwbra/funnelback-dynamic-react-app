@@ -124,6 +124,80 @@ const fbConfigMap = new Map([
           },
         },
       ],
+      facetCheckbox: {
+        content: ({ facet, isSelected }) => `
+        <div class="facet checkbox">
+          <h4>${facet.displayLabel}</h4>
+          <ol>
+            ${facet.allValues
+              .map(
+                (opt, i) => `
+                  <li key="${facet.name}-cb-${i}">
+                    <input
+                      type="checkbox"
+                      id="${facet.name}-cb-${i}"
+                      name="${opt.label}"
+                      value="${opt.toggleUrl}"
+                      ${isSelected(opt.data) ? "checked" : ""}
+                      data-facet-type="checkbox"
+                    />
+                    <label for="${facet.name}-cb-${i}">${opt.label}</label>
+                  </li>
+                `
+              )
+              .join("")}
+          </ol>
+        </div>
+      `,
+      },
+      facetSelect: {
+        content: ({ facet }) => `
+        <div class="facet select">
+          <h4>${facet.displayLabel}</h4>
+          <select data-facet-type="select">
+            <option value="">All</option>
+            ${facet.allValues
+              .map(
+                (opt, i) => `
+                  <option
+                    value="${opt.toggleUrl}"
+                    ${opt.data === facet.selectedValue ? "selected" : ""}
+                  >
+                    ${opt.label}
+                  </option>
+                `
+              )
+              .join("")}
+          </select>
+        </div>
+      `,
+      },
+      facetRadio: {
+        content: ({ facet }) => `
+        <div class="facet radio">
+          <h4>${facet.displayLabel}</h4>
+          <ul>
+            ${facet.allValues
+              .map(
+                (opt, i) => `
+                  <li key="${facet.name}-rb-${i}">
+                    <input
+                      type="radio"
+                      id="${facet.name}-rb-${i}"
+                      name="${facet.name}"
+                      value="${opt.toggleUrl}"
+                      ${opt.data === facet.selectedValue ? "checked" : ""}
+                      data-facet-type="radio"
+                    />
+                    <label for="${facet.name}-rb-${i}">${opt.label}</label>
+                  </li>
+                `
+              )
+              .join("")}
+          </ul>
+        </div>
+      `,
+      },
       search: {
         type: "manual",
         autocomplete: {
