@@ -45,7 +45,8 @@ export interface DataStateTyping {
       options: any;
       displayLabel: string;
     }>;
-    results: { content: (result: any, getMeta: any) => string };
+    results: { content: (innerHtml: any) => string };
+    result: { content: (result: any, getMeta: any) => string };
     noResults: { content: () => string };
     totalResults?: { className?: string };
     search: {
@@ -82,6 +83,7 @@ export interface DataStateTyping {
     listMetadata: Record<string, []>;
     liveUrl: string;
     title: string;
+    rank: number;
   }>;
   networkRequest: { error: string; inProgress: boolean };
   currentStart: number;

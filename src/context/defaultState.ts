@@ -26,6 +26,7 @@ const defaultState: DataStateTyping = {
   templates: {
     facets: [],
     results: { content: () => "" },
+    result: { content: () => "" },
     noResults: { content: () => "" },
     sort: { content: () => "" },
     totalResults: {},

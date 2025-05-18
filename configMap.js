@@ -72,23 +72,39 @@ const fbConfigMap = new Map([
           animation: "pulse",
         },
       },
-      results: {
+      result: {
         content: (result, getMeta) => {
           return `
-          <li>
-            <div>
-              <h3>
-                ${getMeta(result, "title") ?? ""} ${getMeta(
+         <li class="people-card grid-col-sm-full-inner grid-col-md-1of2 grid-col-lg-1of3 grid-col-xl-1of4">
+              <a href="${result.liveUrl}">
+                <div class="image-container">
+                  <img class="people-card-img" src="${getMeta(
+                    result,
+                    "photoUrl"
+                  )}" alt="${getMeta(result, "firstName")} ${getMeta(
             result,
-            "firstName"
-          )}${" "}
-                ${getMeta(result, "lastName")}
-              </h3>
-              <p>jobTitle: ${getMeta(result, "jobTitle")}</p>
-              <p>Bio: ${getMeta(result, "biography")}</p>
-            </div>
-          </li>
+            "lastName"
+          )}" style="width:100%;">
+                  <p class="card-header occupation">${getMeta(
+                    result,
+                    "jobTitle"
+                  )}</p>
+                  <p class="card-text name">                ${
+                    getMeta(result, "title") ?? ""
+                  } ${getMeta(result, "firstName")}${" "}
+                ${getMeta(result, "lastName")}</p>
+                  <svg>
+                    <path d="M17.6881 11.8729C17.1238 11.2118 16.5347 10.2542 15.9208 9H16.9901C18.2475 10.4583 19.5842 11.5375 21 12.2375V12.7625C19.5842 13.4625 18.2475 14.5417 16.9901 16H15.9208C16.5347 14.7458 17.1238 13.7882 17.6881 13.1271H3V11.8729H17.6881Z"></path>
+                  </svg>
+                </div>
+              </a>
+            </li>
         `;
+        },
+      },
+      results: {
+        content: (innterHtml) => {
+          return `<div class="results people-card-container grid-container-25 dark--theme" style="padding-top: 4vw;">${innterHtml}</div>`;
         },
       },
       totalResults: {
@@ -103,6 +119,9 @@ const fbConfigMap = new Map([
             facetsRestricted: true,
           },
           displayLabel: "Last Initial",
+          content: () => {
+            return ``;
+          },
         },
       ],
       search: {
