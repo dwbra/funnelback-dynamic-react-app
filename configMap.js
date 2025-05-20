@@ -112,8 +112,8 @@ const fbConfigMap = new Map([
         },
       },
       results: {
-        content: (innterHtml) => {
-          return `<div class="results people-card-container grid-container-25 dark--theme" style="padding-top: 4vw;">${innterHtml}</div>`;
+        content: (innerHtml) => {
+          return `<div class="results people-card-container grid-container-25 dark--theme" style="padding-top: 4vw;">${innerHtml}</div>`;
         },
       },
       totalResults: {

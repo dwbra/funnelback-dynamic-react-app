@@ -51,9 +51,9 @@ export interface DataStateTyping {
     pagination: { parentNode: string };
     noResults?: { className?: string };
     sort?: any;
-    facetCheckbox: { handleChange: string };
-    facetSelect: { handleChange: string };
-    facetRadio: { handleChange: string };
+    facetCheckbox?: { handleChange: string };
+    facetSelect?: { handleChange: string };
+    facetRadio?: { handleChange: string };
   };
   templates: {
     // Facet templates
@@ -63,15 +63,15 @@ export interface DataStateTyping {
       options: any;
       displayLabel: string;
     }>;
-    facetCheckbox: {
+    facetCheckbox?: {
       content: (args: { facet: FacetTemplateData }) => string;
     };
-    facetSelect: {
+    facetSelect?: {
       content: (args: {
         facet: FacetTemplateData & { selectedValue: string };
       }) => string;
     };
-    facetRadio: {
+    facetRadio?: {
       content: (args: {
         facet: FacetTemplateData & { selectedValue: string };
       }) => string;

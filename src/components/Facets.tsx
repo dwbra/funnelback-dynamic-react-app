@@ -63,11 +63,11 @@ const Facets: React.FC = () => {
       );
 
     let facetType: "checkbox" | "select" | "radio";
-    if (classList.includes(cbClass)) {
+    if (cbClass && classList.includes(cbClass)) {
       facetType = "checkbox";
-    } else if (classList.includes(slClass)) {
+    } else if (slClass && classList.includes(slClass)) {
       facetType = "select";
-    } else if (classList.includes(rbClass)) {
+    } else if (rbClass && classList.includes(rbClass)) {
       facetType = "radio";
     } else {
       // not one of our facets, ignore it
@@ -108,11 +108,11 @@ const Facets: React.FC = () => {
     .map((facet) => {
       switch (facet.type) {
         case "checkbox":
-          return templates.facetCheckbox.content({ facet });
+          return templates.facetCheckbox?.content({ facet });
         case "select":
-          return templates.facetSelect.content({ facet });
+          return templates.facetSelect?.content({ facet });
         case "radio":
-          return templates.facetRadio.content({ facet });
+          return templates.facetRadio?.content({ facet });
         default:
           return "";
       }
@@ -138,7 +138,7 @@ const Facets: React.FC = () => {
       };
 
       // checkbox inputs
-      if (name === "input" && classList.includes(cbClass)) {
+      if (name === "input" && cbClass && classList.includes(cbClass)) {
         return (
           <input
             {...mapProps()}
@@ -151,7 +151,7 @@ const Facets: React.FC = () => {
       }
 
       // select dropdowns
-      if (name === "select" && classList.includes(slClass)) {
+      if (name === "select" && slClass && classList.includes(slClass)) {
         return (
           <select
             {...mapProps()}
@@ -166,7 +166,7 @@ const Facets: React.FC = () => {
       }
 
       // radio inputs
-      if (name === "input" && classList.includes(rbClass)) {
+      if (name === "input" && rbClass && classList.includes(rbClass)) {
         return (
           <input
             {...mapProps()}
