@@ -22,6 +22,15 @@ const defaultState: DataStateTyping = {
       wrapper: "",
     },
     results: { parentNode: "", ulClassName: "" },
+    facetCheckbox: {
+      handleChange: ".facet-checkbox-input",
+    },
+    facetSelect: {
+      handleChange: ".facet-select-element",
+    },
+    facetRadio: {
+      handleChange: ".facet-radio-input",
+    },
   },
   templates: {
     facets: [],

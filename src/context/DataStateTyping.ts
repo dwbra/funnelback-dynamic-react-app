@@ -27,7 +27,6 @@ export interface DataStateTyping {
     defaultQuery: string;
     additionalParams: Array<Record<string, string>>;
   };
-
   selectors: {
     search: {
       parentNode: string;
@@ -56,7 +55,6 @@ export interface DataStateTyping {
     facetSelect: { handleChange: string };
     facetRadio: { handleChange: string };
   };
-
   templates: {
     // Facet templates
     facets: Array<{
@@ -89,7 +87,6 @@ export interface DataStateTyping {
       content: () => string;
     };
     totalResults?: { className?: string };
-
     // Search templates
     search: {
       type: string;
