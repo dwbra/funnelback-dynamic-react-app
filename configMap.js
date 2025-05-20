@@ -122,7 +122,7 @@ const fbConfigMap = new Map([
       facets: [
         {
           name: "LastNameInitial",
-          type: "select",
+          type: "radio",
           options: {
             singleChoice: false,
             facetsRestricted: true,
@@ -131,7 +131,7 @@ const fbConfigMap = new Map([
         },
       ],
       facetCheckbox: {
-        content: ({ facet }) => `
+        content: (facet) => `
         <div class="facet checkbox">
           <h4>${facet.displayLabel}</h4>
           <ol>
@@ -158,7 +158,7 @@ const fbConfigMap = new Map([
       `,
       },
       facetSelect: {
-        content: ({ facet }) => `
+        content: (facet) => `
         <div class="facet select">
           <h4>${facet.displayLabel}</h4>
           <select class="select-facet-handler" data-facet-name=${facet.name}>
@@ -177,7 +177,7 @@ const fbConfigMap = new Map([
       `,
       },
       facetRadio: {
-        content: ({ facet }) => `
+        content: (facet) => `
         <div class="facet radio">
           <h4>${facet.displayLabel}</h4>
           <ul>
@@ -190,7 +190,6 @@ const fbConfigMap = new Map([
                       id="${facet.name}-rb-${i}"
                       name="${facet.name}"
                       value="${opt.toggleUrl}"
-                      ${opt.data === facet.selectedValue ? "checked" : ""}
                       data-facet-name=${facet.name}
                       data-facet-value=${opt.data}
                       class="radio-facet-handler"

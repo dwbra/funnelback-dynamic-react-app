@@ -10,12 +10,6 @@ export interface FacetItem {
   toggleUrl: string;
 }
 
-interface FacetTemplateData {
-  name: string;
-  displayLabel: string;
-  allValues: FacetItem[];
-}
-
 export interface DataStateTyping {
   fbConfig: {
     searchUrl: string;
@@ -64,17 +58,13 @@ export interface DataStateTyping {
       displayLabel: string;
     }>;
     facetCheckbox?: {
-      content: (args: { facet: FacetTemplateData }) => string;
+      content: (facet: any) => string;
     };
     facetSelect?: {
-      content: (args: {
-        facet: FacetTemplateData & { selectedValue: string };
-      }) => string;
+      content: (facet: any) => string;
     };
     facetRadio?: {
-      content: (args: {
-        facet: FacetTemplateData & { selectedValue: string };
-      }) => string;
+      content: (facet: any) => string;
     };
     // Result templates
     results: {

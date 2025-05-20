@@ -108,11 +108,11 @@ const Facets: React.FC = () => {
     .map((facet) => {
       switch (facet.type) {
         case "checkbox":
-          return templates.facetCheckbox?.content({ facet });
+          return templates.facetCheckbox?.content(facet);
         case "select":
-          return templates.facetSelect?.content({ facet });
+          return templates.facetSelect?.content(facet);
         case "radio":
-          return templates.facetRadio?.content({ facet });
+          return templates.facetRadio?.content(facet);
         default:
           return "";
       }
