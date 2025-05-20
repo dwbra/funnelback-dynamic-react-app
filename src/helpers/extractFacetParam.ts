@@ -1,5 +1,6 @@
 const extractFacetParam = (
-  url: string
+  url: string,
+  paramStartsWith: string
 ): { decodedFacetKey: string; decodedFacetValue: string } | null => {
   try {
     // Remove the leading '?' if present
@@ -9,7 +10,7 @@ const extractFacetParam = (
 
     for (const param of params) {
       // Look for the facet parameter which starts with 'f.'
-      if (param.startsWith("f.")) {
+      if (param.startsWith(`f.${paramStartsWith}`)) {
         const [facetKey, facetValue] = param.split("=");
         if (facetKey && facetValue) {
           const decodedFacetKey = decodeURIComponent(facetKey);

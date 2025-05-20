@@ -52,6 +52,9 @@ export interface DataStateTyping {
     pagination: { parentNode: string };
     noResults?: { className?: string };
     sort?: any;
+    facetCheckbox: { handleChange: string };
+    facetSelect: { handleChange: string };
+    facetRadio: { handleChange: string };
   };
 
   templates: {
@@ -62,27 +65,19 @@ export interface DataStateTyping {
       options: any;
       displayLabel: string;
     }>;
-
     facetCheckbox: {
-      content: (args: {
-        facet: FacetTemplateData;
-        /** mark checkbox checked/unchecked */
-        isSelected: (value: string) => boolean;
-      }) => string;
+      content: (args: { facet: FacetTemplateData }) => string;
     };
-
     facetSelect: {
       content: (args: {
         facet: FacetTemplateData & { selectedValue: string };
       }) => string;
     };
-
     facetRadio: {
       content: (args: {
         facet: FacetTemplateData & { selectedValue: string };
       }) => string;
     };
-
     // Result templates
     results: {
       content: (innerHtml: ReactNode) => string;

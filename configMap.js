@@ -53,6 +53,15 @@ const fbConfigMap = new Map([
         parentNode: ".sort",
         handleChange: "sort-fb",
       },
+      facetCheckbox: {
+        handleChange: "checkbox-facet-handler",
+      },
+      facetSelect: {
+        handleChange: "select-facet-handler",
+      },
+      facetRadio: {
+        handleChange: "radio-facet-handler",
+      },
     },
   ],
   [
@@ -113,19 +122,16 @@ const fbConfigMap = new Map([
       facets: [
         {
           name: "LastNameInitial",
-          type: "checkbox",
+          type: "select",
           options: {
             singleChoice: false,
             facetsRestricted: true,
           },
           displayLabel: "Last Initial",
-          content: () => {
-            return ``;
-          },
         },
       ],
       facetCheckbox: {
-        content: ({ facet, isSelected }) => `
+        content: ({ facet }) => `
         <div class="facet checkbox">
           <h4>${facet.displayLabel}</h4>
           <ol>
@@ -138,8 +144,9 @@ const fbConfigMap = new Map([
                       id="${facet.name}-cb-${i}"
                       name="${opt.label}"
                       value="${opt.toggleUrl}"
-                      ${isSelected(opt.data) ? "checked" : ""}
-                      data-facet-type="checkbox"
+                      data-facet-name=${facet.name}
+                      data-facet-value=${opt.data}
+                      class="checkbox-facet-handler"
                     />
                     <label for="${facet.name}-cb-${i}">${opt.label}</label>
                   </li>
@@ -154,15 +161,12 @@ const fbConfigMap = new Map([
         content: ({ facet }) => `
         <div class="facet select">
           <h4>${facet.displayLabel}</h4>
-          <select data-facet-type="select">
+          <select class="select-facet-handler" data-facet-name=${facet.name}>
             <option value="">All</option>
             ${facet.allValues
               .map(
                 (opt, i) => `
-                  <option
-                    value="${opt.toggleUrl}"
-                    ${opt.data === facet.selectedValue ? "selected" : ""}
-                  >
+                  <option value="${opt.toggleUrl}" data-facet-value="${opt.data}">
                     ${opt.label}
                   </option>
                 `
@@ -187,7 +191,9 @@ const fbConfigMap = new Map([
                       name="${facet.name}"
                       value="${opt.toggleUrl}"
                       ${opt.data === facet.selectedValue ? "checked" : ""}
-                      data-facet-type="radio"
+                      data-facet-name=${facet.name}
+                      data-facet-value=${opt.data}
+                      class="radio-facet-handler"
                     />
                     <label for="${facet.name}-rb-${i}">${opt.label}</label>
                   </li>

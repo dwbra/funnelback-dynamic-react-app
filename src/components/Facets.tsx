@@ -2,7 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useDataDispatch, useDataState } from "../context/DataState";
-import extractFacetKey from "../helpers/extractFacetParam";
+import extractFacetParam from "../helpers/extractFacetParam";
+// import buildFacetParam from "../helpers/buildFacetParam";
 import DOMPurify from "dompurify";
 import parse, {
   domToReact,
@@ -16,7 +17,6 @@ const Facets: React.FC = () => {
   const dispatch = useDataDispatch();
   const [container, setContainer] = useState<HTMLElement | null>(null);
 
-  // 1) find portal target
   useEffect(() => {
     const sel = selectors.facets?.parentNode;
     if (!sel) return;
@@ -24,7 +24,9 @@ const Facets: React.FC = () => {
     if (el instanceof HTMLElement) setContainer(el);
   }, [selectors.facets]);
 
-  // 2) massage facet data
+  // Only accept facets from the configMap.js
+  // Sort them into alphabetical order at least
+  // Attach more data to the original facet object from the config
   const activeFacets = facets!
     .filter((f) => templates.facets.some((t) => t.name === f.name))
     .map((f) => {
@@ -44,12 +46,37 @@ const Facets: React.FC = () => {
       };
     });
 
-  // 3) your delegated handler
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const onChangeHandler = (e: React.ChangeEvent<any>) => {
-    const input = e.target as HTMLInputElement;
-    const facetType = input.dataset.facetType!;
-    const info = extractFacetKey(input.value);
+  const cbClass = selectors.facetCheckbox?.handleChange;
+  const slClass = selectors.facetSelect?.handleChange;
+  const rbClass = selectors.facetRadio?.handleChange;
+
+  const onChangeHandler = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const target = e.target;
+    const classList = Array.from(target.classList);
+    const facetName = target.dataset.facetName || null;
+
+    if (!facetName)
+      throw new Error(
+        "No facetName is set on the data attribute for this html element."
+      );
+
+    let facetType: "checkbox" | "select" | "radio";
+    if (classList.includes(cbClass)) {
+      facetType = "checkbox";
+    } else if (classList.includes(slClass)) {
+      facetType = "select";
+    } else if (classList.includes(rbClass)) {
+      facetType = "radio";
+    } else {
+      // not one of our facets, ignore it
+      return;
+    }
+
+    // extract the facet key/value from the URL
+    const info = extractFacetParam(target.value, facetName);
+
     if (!info) {
       dispatch({ type: "clearAllSelectedFacets" });
       return;
@@ -67,7 +94,7 @@ const Facets: React.FC = () => {
         facetType,
       });
     } else {
-      // radio & select both map to updateSelectFacet
+      // radio & select both use updateSelectFacet
       dispatch({
         type: "updateSelectFacet",
         facetKey: decodedFacetKey,
@@ -77,16 +104,11 @@ const Facets: React.FC = () => {
     }
   };
 
-  // 4) build pure-HTML string
   const rawHtml = activeFacets
     .map((facet) => {
       switch (facet.type) {
         case "checkbox":
-          return templates.facetCheckbox.content({
-            facet,
-            isSelected: (v: string) =>
-              selectedFacets.some((sf) => sf.facetValue === v),
-          });
+          return templates.facetCheckbox.content({ facet });
         case "select":
           return templates.facetSelect.content({ facet });
         case "radio":
@@ -97,22 +119,30 @@ const Facets: React.FC = () => {
     })
     .join("");
 
-  // 5) sanitize
   const cleanHtml = DOMPurify.sanitize(rawHtml);
 
-  // 6) parser options: attach onChange to inputs/selects by data-facet-type
+  // attach onChange and selected to inputs/selects
   const parserOptions: HTMLReactParserOptions = {
     replace: (domNode) => {
       if (domNode.type !== "tag" || !(domNode instanceof DomElement)) {
         return;
       }
-      const { name, attribs, children } = domNode;
-      const type = attribs["data-facet-type"];
 
-      if (name === "input" && type) {
+      const { name, attribs, children } = domNode;
+      const classList = attribs.class?.split(" ") || [];
+      const facetValue = attribs["data-facet-value"] ?? null;
+
+      const mapProps = () => {
+        const { class: _class, ...rest } = attribs;
+        return { className: _class, ...rest };
+      };
+
+      // checkbox inputs
+      if (name === "input" && classList.includes(cbClass)) {
         return (
           <input
-            {...attribs}
+            {...mapProps()}
+            checked={selectedFacets.some((sf) => sf.facetValue === facetValue)}
             onChange={(e) =>
               onChangeHandler(e as React.ChangeEvent<HTMLInputElement>)
             }
@@ -120,10 +150,12 @@ const Facets: React.FC = () => {
         );
       }
 
-      if (name === "select" && type === "select") {
+      // select dropdowns
+      if (name === "select" && classList.includes(slClass)) {
         return (
           <select
-            {...attribs}
+            {...mapProps()}
+            defaultValue=""
             onChange={(e) =>
               onChangeHandler(e as React.ChangeEvent<HTMLSelectElement>)
             }
@@ -133,15 +165,25 @@ const Facets: React.FC = () => {
         );
       }
 
-      // leave everything else alone
+      // radio inputs
+      if (name === "input" && classList.includes(rbClass)) {
+        return (
+          <input
+            {...mapProps()}
+            checked={selectedFacets.some((sf) => sf.facetValue === facetValue)}
+            onChange={(e) =>
+              onChangeHandler(e as React.ChangeEvent<HTMLInputElement>)
+            }
+          />
+        );
+      }
+
       return;
     },
   };
 
-  // 7) parse into React nodes
   const facetNodes = parse(cleanHtml, parserOptions);
 
-  // 8) portal it
   if (!container) return null;
   return createPortal(
     <div className={selectors.facets.wrapper}>{facetNodes}</div>,
