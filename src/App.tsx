@@ -11,31 +11,6 @@ import Results from "./components/Results";
 import Pagination from "./components/Pagination";
 import Sort from "./components/Sort";
 
-// type RenderIfProps = {
-//   selector: string;
-//   component: string;
-//   children: React.ReactNode;
-// };
-
-// const RenderIf: React.FC<RenderIfProps> = ({
-//   selector,
-//   component,
-//   children,
-// }) => {
-//   // warn whenever selector is falsy
-//   useEffect(() => {
-//     if (!selector) {
-//       console.warn(`${component} - No parentNode selector is set.`);
-//     }
-//   }, [selector, component]);
-
-//   if (!selector) {
-//     return null;
-//   }
-
-//   return children;
-// };
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function App({ fbConfig, templates, selectors }: any) {
   const { favouriteKeys } = useDataState();
